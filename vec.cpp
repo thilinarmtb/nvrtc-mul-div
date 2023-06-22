@@ -38,11 +38,12 @@ extern "C" __global__ void vectorAdd(double *A, double *B, double C, int numElem
 )"};
 
 int main(int argc, char **argv) {
-  if (argc != 2) {
-    fprintf(stderr, "Usage: %s <kernel_id>\n", argv[0]);
+  if (argc != 3) {
+    fprintf(stderr, "Usage: %s <kernel_id> <array_size>\n", argv[0]);
     exit(EXIT_FAILURE);
   }
   int knl = atoi(argv[1]);
+  int numElements = atoi(argv[2]);
 
   nvrtcProgram prog;
   if (knl == 0) {
@@ -85,9 +86,7 @@ int main(int argc, char **argv) {
   CUfunction knlAddr;
   checkCudaErrors(cuModuleGetFunction(&knlAddr, module, "vectorAdd"));
 
-  int numElements = 50000;
   size_t size = numElements * sizeof(double);
-
   double *h_A = reinterpret_cast<double *>(malloc(size));
   double *h_B = reinterpret_cast<double *>(malloc(size));
   double *h_C = reinterpret_cast<double *>(malloc(size));
