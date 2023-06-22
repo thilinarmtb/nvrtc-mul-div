@@ -21,7 +21,7 @@ inline void __checkCudaErrors(CUresult err, const char *file, const int line) {
 }
 #define checkCudaErrors(err) __checkCudaErrors(err, __FILE__, __LINE__)
 
-static constexpr auto knl_div{R"(
+static constexpr auto knlDiv{R"(
 extern "C" __global__ void vectorAdd(double *A, double *B, double C, int numElements) {
   int i = blockDim.x * blockIdx.x + threadIdx.x;
   if (i < numElements)
@@ -29,7 +29,7 @@ extern "C" __global__ void vectorAdd(double *A, double *B, double C, int numElem
 }
 )"};
 
-static constexpr auto knl_mul{R"(
+static constexpr auto knlMul{R"(
 extern "C" __global__ void vectorAdd(double *A, double *B, double C, int numElements) {
   int i = blockDim.x * blockIdx.x + threadIdx.x;
   if (i < numElements)
@@ -42,16 +42,16 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Usage: %s <kernel_id> <array_size>\n", argv[0]);
     exit(EXIT_FAILURE);
   }
-  int knl = atoi(argv[1]);
+  int knlId = atoi(argv[1]);
   int numElements = atoi(argv[2]);
 
   nvrtcProgram prog;
-  if (knl == 0) {
-    nvrtcCreateProgram(&prog, knl_div, "prog.cu", 0, nullptr, nullptr);
+  if (knlId == 0) {
+    nvrtcCreateProgram(&prog, knlDiv, "prog.cu", 0, nullptr, nullptr);
     printf("div selected.\n");
   }
-  if (knl == 1) {
-    nvrtcCreateProgram(&prog, knl_mul, "prog.cu", 0, nullptr, nullptr);
+  if (knlId == 1) {
+    nvrtcCreateProgram(&prog, knlMul, "prog.cu", 0, nullptr, nullptr);
     printf("mul selected.\n");
   }
 
@@ -134,9 +134,9 @@ int main(int argc, char **argv) {
   checkCudaErrors(cuMemcpyDtoH(h_C, d_A, size));
 
   double M;
-  if (knl == 0)
+  if (knlId == 0)
     M = 1.0 / C;
-  if (knl == 1)
+  if (knlId == 1)
     M = C;
 
   for (int i = 0; i < numElements; ++i) {
